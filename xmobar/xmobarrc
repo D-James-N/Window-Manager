@@ -1,0 +1,84 @@
+Config { font = "xft:Ubuntu:weight=bold:pixelsize=12:antialias=true:hinting=true"
+       , additionalFonts = [ "xft:Mononoki:pixelsize=11:antialias=true:hinting=true"
+			   , "xft:Font Awesome 6 Free Solid:pixelsize=12"
+			   , "xft:Font Awesome 6 Brands:pixelsize=12"
+			   ]
+
+
+       , bgColor      = "#002b36"
+       , fgColor      = "#839496"
+       , border       = BottomB --TopB
+       , borderColor =  "#646464"
+
+       , position = Top --Bottom
+       , lowerOnStart = False
+       , hideOnStart  = False
+       , allDesktops  = True
+       , pickBroadest = False
+       , persistent   = True
+       , overrideRedirect = True
+       , commands = [
+
+                      -- Locks Caps etc.
+                     Run Locks
+
+		      -- wifi connection information 
+		    , Run Wireless "wlp3s0" ["-t", "WiFi: [<essid>] <quality>"] 10
+
+			-- Time and date
+                    --, Run Com "echo" ["<fn=2>\f017</fn>"] "time" 0
+                    , Run Date "  %b %d %Y - (%H:%M) " "date" 50
+
+                        -- Kernal uname
+                    , Run Com "uname" ["-s","-r"] "" 0
+
+		      -- Ram used number and percent
+		    , Run Memory ["-t", "  Mem: <used>M (<usedratio>%)"] 10
+
+		      -- Cpu usage in percent
+		    , Run Cpu ["-t", "  CPU: (<total>%)","-H","50","--high","red"] 10
+
+		      -- Disk space free
+		    , Run DiskU [("/", "  NVME: <free> free")] [] 60
+
+		      -- Battery
+		    , Run Battery        [ "--template" , "Batt: <acstatus>"
+                             , "--Low"      , "10"        -- units: %
+                             , "--High"     , "80"        -- units: %
+                             , "--low"      , "red"
+                             , "--normal"   , "orange"
+                             , "--high"     , "green"
+
+                             , "--" -- battery specific options
+                                       -- discharging status
+                                       , "-o"	, "<left>% (<timeleft>)"
+                                       -- AC "on" status
+                                       , "-O"	, "<fc=#dAA520>Charging</fc>"
+                                       -- charged status
+                                       , "-i"	, "<fc=#006000>Charged</fc>"
+                             ] 50
+
+		       -- keyboard layout indicator
+                    , Run Kbd            [ ("us(dvorak)" , "<fc=#00008B>DV</fc>")
+                                       , ("us"         , "<fc=#ffffff>Us</fc>")
+				       , ("ru"         , "<fc=#ffffff>Ru</fc>")
+				       , ("ua"         , "<fc=#ffffff>Ua</fc>")
+                                       ]
+
+                      -- Volume 
+		    , Run Volume "default" "Master" [] 1
+
+		      -- Brightness
+		    , Run Brightness ["-t", "Screen: |<vbar>|", "--", "-D", "amdgpu_bl0"] 1
+
+                      -- Script that dynamically adjusts xmobar padding depending on number of trayer icons.
+--                    , Run Com "bash ~/.xmonad/trayer-padding-icon.sh" [] "trayerpad" 20
+
+		      -- Prints out the left side items such as workspaces, layout, etc.
+                    , Run UnsafeStdinReader
+                    ]
+
+       , sepChar = "%"
+       , alignSep = "}{"
+       , template = " %UnsafeStdinReader% }{ <fc=#ededed>%locks%</fc>  <fc=#ffb000>%wlp3s0wi%</fc>  <box type=Bottom width=2 mb=2 color=#286bd2><fc=#286bd2><action='gnome-clocks'>%date%</action></fc></box>   <fc=#df0000><action='gnome-terminal'>%uname%</action></fc>   <box type=Bottom width=2 mb=2 color=#268bd2><fc=#268bd2>%memory%</fc></box>   <box type=Bottom width=2 mb=2 color=#859900><fc=#859900><action='gnome-terminal --title=Htop -- htop'>%cpu%</action></fc></box>    <box type=Bottom width=2 mb=2 color=#b59800><fc=#b59800><action='gnome-disks'>%disku%</action></fc></box>   <box type=Bottom width=2 mb=2 color=#dc322f><fc=#dc322f><action='gnome-power-statistics'>%battery%</action></fc></box>   <box type=Bottom width=2 mb=2 color=#800080>%kbd%</box>   <box type=Bottom width=2 mb=2 color=#00ec96><fc=#00ffd7>%default:Master%</fc></box>   <fc=#ffffff>%bright%</fc>   "  --%trayerpad% "
+       }
